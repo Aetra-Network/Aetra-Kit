@@ -1,0 +1,82 @@
+{
+  "name": "@aetra/kit",
+  "version": "0.1.0",
+  "description": "The viem/wagmi analogue for the Aetra L1 — typed public/wallet clients, functional address & AET amount utils, a unified transaction-intent list that executes through a local key or a connected wallet, contract reads/execution/deployment, and React hooks (@aetra/kit/react).",
+  "keywords": [
+    "aetra",
+    "web3",
+    "wagmi",
+    "viem",
+    "wallet",
+    "smart-contracts",
+    "react",
+    "hooks"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aetra-Network/Aetra-Kit.git"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test && npm run build"
+  },
+  "peerDependencies": {
+    "@aetra/connect": ">=0.1.0 <1",
+    "@aetra/connect-react": ">=0.1.0 <1",
+    "@aetra/sdk": ">=0.1.0 <1",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@aetra/connect-react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@aetra/connect": "file:../aetra-connect",
+    "@aetra/connect-react": "file:../aetra-connect-react",
+    "@aetra/sdk": "file:../sdk",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "jsdom": "^25.0.0",
+    "react": "^19",
+    "react-dom": "^19",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
