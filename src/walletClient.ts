@@ -46,6 +46,9 @@ export class WalletClient {
   readonly account: AetraAccount;
   readonly public: PublicClient;
 
+  /** Serializes local sends so two concurrent calls never read and sign the same account sequence. */
+  private sendQueue: Promise<void> = Promise.resolve();
+
   constructor(config: WalletClientConfig) {
     this.account = resolveAccount(config.account);
     this.public = config.client ?? createPublicClient({ ...(config.url ? { url: config.url } : {}), ...(config.fetch ? { fetch: config.fetch } : {}) });
@@ -151,7 +154,7 @@ export class WalletClient {
         salt: params.salt,
         ...(params.initFields ? { initFields: fieldsToSpecs(params.initFields) } : {}),
         ...(params.initialBalance !== undefined ? { initialBalanceNaet: toNaetString(params.initialBalance) } : {}),
-        ...(params.admin ? { admin: params.admin } : {}),
+        ...(params.admin ? { admin: Address.fromString(params.admin).toUserFriendly() } : {}),
         ...(params.gasLimit !== undefined ? { gasLimit: params.gasLimit } : {}),
       },
     ]);
@@ -178,7 +181,17 @@ export class WalletClient {
 
   // --- Local pipeline ----------------------------------------------------
 
-  private async sendLocal(intents: ConnectTxMessage[], opts: { memo?: string; gasLimit?: bigint }): Promise<TxResult> {
+  /** Queues onto `sendQueue` so a second concurrent call always waits for the first to finish signing and broadcasting. */
+  private sendLocal(intents: ConnectTxMessage[], opts: { memo?: string; gasLimit?: bigint }): Promise<TxResult> {
+    const result = this.sendQueue.then(() => this.sendLocalNow(intents, opts));
+    this.sendQueue = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    return result;
+  }
+
+  private async sendLocalNow(intents: ConnectTxMessage[], opts: { memo?: string; gasLimit?: bigint }): Promise<TxResult> {
     const wallet = (this.account as { wallet: Wallet }).wallet;
     const address = wallet.address.toUserFriendly();
 

@@ -60,7 +60,9 @@ export function compileIntents(intents: ConnectTxMessage[], signer: Wallet, heig
   for (const intent of intents) {
     switch (intent.kind) {
       case "send": {
-        messages.push(new MsgSend({ from: signer.address, to: intent.to, amount: Amount.fromNaet(intent.amountNaet) }));
+        messages.push(
+          new MsgSend({ from: signer.address, to: Address.fromString(intent.to).toUserFriendly(), amount: Amount.fromNaet(intent.amountNaet) }),
+        );
         gasLimit += GAS.send!;
         break;
       }
@@ -131,7 +133,7 @@ export function compileIntents(intents: ConnectTxMessage[], signer: Wallet, heig
             salt: intent.salt,
             initPayload,
             initialBalance: intent.initialBalanceNaet !== undefined ? Amount.fromNaet(intent.initialBalanceNaet) : undefined,
-            admin: intent.admin,
+            admin: intent.admin !== undefined ? Address.fromString(intent.admin).toUserFriendly() : undefined,
             height,
           }),
         );

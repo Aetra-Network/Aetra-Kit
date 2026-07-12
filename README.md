@@ -21,6 +21,28 @@ npm install @aetra/kit @aetra/sdk @aetra/connect
 npm install @aetra/connect-react react
 ```
 
+## Environments
+
+`@aetra/kit` ships **ESM-only** (`"type": "module"`, no CJS build) — so does
+every package underneath it (`@aetra/sdk`, `@aetra/connect`,
+`@aetra/connect-react`). `require("@aetra/kit")` will not work; `import`
+(static, or dynamic `import()` from a CommonJS file) will. This is a
+deliberate choice, not an oversight: the whole dependency chain is ESM-only,
+so a CJS build of kit would still crash the moment it required one of those
+packages — shipping one would look "more universal" while actually breaking
+at runtime.
+
+Requires Node.js **>=18**, or any bundler/runtime with a modern ESM resolver
+for the browser. There are no Node-only APIs in the client/account/intent
+layer: networking goes through the global `fetch` (override it via `{ fetch }`
+on any client config, for a runtime that needs it), and the signing/crypto
+underneath (`@noble/curves`, `@noble/hashes`, `@scure/bip32`/`bip39`) prefers
+WebCrypto (`crypto.getRandomValues`) wherever it's available, falling back to
+Node's `crypto` module only on old Node. The same build runs unmodified in
+Node, browsers, and edge runtimes (Cloudflare Workers, Vercel Edge, and
+similar). `@aetra/kit/react` additionally needs a DOM (browser or React
+Native) — it's never pulled in by a Node-only consumer of the root export.
+
 ## Functional utils
 
 ```ts
@@ -98,6 +120,12 @@ await wallet.send([
   { kind: "stake.deposit", poolId: "pool-1", amountNaet: "5000000000" },
 ]);
 ```
+
+Advanced: the same compiler `WalletClient` uses internally is exported
+directly — `compileIntents(intents, wallet, height)` turns an intent list into
+signed-tx-ready SDK messages (`payloadFrom`/`fieldsToSpecs` convert contract
+field specs along the way) without a `WalletClient` in the loop, for callers
+building their own local-signing pipeline.
 
 ### Contracts
 
@@ -192,7 +220,7 @@ fully custom look.
 
 ```bash
 npm install
-npm run check   # typecheck + 20 tests (node + jsdom) + build
+npm run check   # typecheck + 24 tests (node + jsdom) + build
 ```
 
 ## License

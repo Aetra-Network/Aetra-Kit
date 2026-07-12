@@ -11,6 +11,13 @@ export interface FakeGatewayState {
   /** Hashes that /txs/:hash should 404 for this many more polls (for waitForTransaction). */
   pendingPolls: Map<string, number>;
   contractResult: { success: boolean; result?: string; result_type?: string; error?: string };
+  /** account_number/sequence served by /accounts/:addr; sequence auto-increments on each accepted broadcast. */
+  accountNumber: string;
+  sequence: number;
+  /** The sequence value served on each /accounts/:addr call, in order — lets tests prove sends serialized. */
+  sequencesServed: number[];
+  /** When set, /tx/broadcast returns this rejection instead of accepting. */
+  broadcastFailure?: { code: number; log: string };
 }
 
 export function fakeGateway(overrides: Partial<FakeGatewayState> = {}) {
@@ -21,6 +28,9 @@ export function fakeGateway(overrides: Partial<FakeGatewayState> = {}) {
     broadcasts: [],
     pendingPolls: new Map(),
     contractResult: { success: true, result: "7", result_type: "uint64" },
+    accountNumber: "7",
+    sequence: 3,
+    sequencesServed: [],
     ...overrides,
   };
 
@@ -40,7 +50,8 @@ export function fakeGateway(overrides: Partial<FakeGatewayState> = {}) {
     }
     if (path.startsWith("/accounts/") && !path.includes("/txs") && !path.endsWith("/status")) {
       const addr = path.slice("/accounts/".length);
-      return json({ address: addr, valid: true, exists: true, account_number: "7", sequence: "3" });
+      state.sequencesServed.push(state.sequence);
+      return json({ address: addr, valid: true, exists: true, account_number: state.accountNumber, sequence: String(state.sequence) });
     }
     if (path === "/fees/estimate") {
       const gas = Number(url.searchParams.get("gas") ?? "200000");
@@ -59,6 +70,10 @@ export function fakeGateway(overrides: Partial<FakeGatewayState> = {}) {
     if (path === "/tx/broadcast") {
       const body = JSON.parse(String(init?.body ?? "{}")) as { tx_bytes?: string };
       state.broadcasts.push(body.tx_bytes ?? "");
+      if (state.broadcastFailure) {
+        return json({ hash: `HASH${state.broadcasts.length}`, code: state.broadcastFailure.code, log: state.broadcastFailure.log, accepted: false });
+      }
+      state.sequence += 1;
       return json({ hash: `HASH${state.broadcasts.length}`, code: 0, log: "", accepted: true });
     }
     if (path.startsWith("/txs/")) {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Wallet, Field } from "@aetra/sdk";
+import { Wallet, Field, Mnemonic } from "@aetra/sdk";
 import { AetraWalletConnect, MemoryBridge, type SendTransactionParams } from "@aetra/connect";
 import { AetraConnect } from "@aetra/connect/dapp";
 import { createPublicClient, createWalletClient, localAccount, connectAccount } from "../src/index.js";
@@ -64,14 +64,62 @@ describe("WalletClient — local account", () => {
 
   it("accepts a mnemonic source and bigint amounts", async () => {
     const { fetchImpl } = fakeGateway();
-    const phrase = Wallet.random(); // derive a valid mnemonic via SDK
+    const mnemonic = Mnemonic.generate();
+    const expected = Wallet.fromMnemonic(mnemonic);
+    const wc = createWalletClient({
+      account: { mnemonic: mnemonic.toString() },
+      url: "http://gw",
+      fetch: fetchImpl,
+    });
+    expect(wc.address).toBe(expected.address.toUserFriendly());
+    const res = await wc.sendAet({ to: Wallet.random().address.toUserFriendly(), amount: 42n });
+    expect(res.accepted).toBe(true);
+  });
+
+  it("accepts a raw private-key-hex source", async () => {
+    const { fetchImpl } = fakeGateway();
+    const phrase = Wallet.random();
     const wc = createWalletClient({
       account: { privateKeyHex: phrase.privateKeyHex },
       url: "http://gw",
       fetch: fetchImpl,
     });
+    expect(wc.address).toBe(phrase.address.toUserFriendly());
     const res = await wc.sendAet({ to: Wallet.random().address.toUserFriendly(), amount: 42n });
     expect(res.accepted).toBe(true);
+  });
+
+  it("normalizes a raw bech32 recipient (compileIntents doesn't require the caller to pre-normalize)", async () => {
+    const { fetchImpl } = fakeGateway();
+    const wc = createWalletClient({ account: Wallet.random(), url: "http://gw", fetch: fetchImpl });
+    const recipient = Wallet.random().address;
+
+    const res = await wc.send([{ kind: "send", to: recipient.toRaw(), amountNaet: "100" }]);
+    expect(res.accepted).toBe(true);
+  });
+
+  it("surfaces a rejected broadcast instead of a silent success", async () => {
+    const { fetchImpl } = fakeGateway({ broadcastFailure: { code: 5, log: "insufficient funds" } });
+    const wc = createWalletClient({ account: Wallet.random(), url: "http://gw", fetch: fetchImpl });
+
+    const res = await wc.sendAet({ to: Wallet.random().address.toUserFriendly(), amount: "1" });
+    expect(res.accepted).toBe(false);
+  });
+
+  it("serializes concurrent sends on the same local account instead of racing the sequence", async () => {
+    const { fetchImpl, state } = fakeGateway();
+    const wc = createWalletClient({ account: Wallet.random(), url: "http://gw", fetch: fetchImpl });
+
+    const [a, b] = await Promise.all([
+      wc.sendAet({ to: Wallet.random().address.toUserFriendly(), amount: "1" }),
+      wc.sendAet({ to: Wallet.random().address.toUserFriendly(), amount: "1" }),
+    ]);
+
+    expect(a.accepted).toBe(true);
+    expect(b.accepted).toBe(true);
+    expect(state.broadcasts).toHaveLength(2);
+    // Each send read a distinct, up-to-date sequence — proof the second waited for the first.
+    expect(state.sequencesServed).toEqual([3, 4]);
   });
 
   it("executes a batch of intents in one tx (send + stake.deposit)", async () => {
