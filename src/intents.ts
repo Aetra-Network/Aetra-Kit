@@ -66,8 +66,10 @@ export function compileIntents(intents: ConnectTxMessage[], signer: Wallet, heig
       }
       case "activate": {
         messages.push(new MsgActivateAccount({ identity: signer.nativeIdentity(), pubkeyHex: signer.pubkeyHex }));
-        // The synthetic identity address has no balance — the plain account pays.
-        feePayer = signer.address;
+        // No explicit fee payer: the tx is signed by the plain account (the sole
+        // entry in AuthInfo), so it pays by default. Setting a payer here would
+        // need the bech32 form — the AE user-facing form fails the ante's
+        // bech32 decode ("Invalid fee payer address").
         gasLimit += GAS.activate!;
         break;
       }
