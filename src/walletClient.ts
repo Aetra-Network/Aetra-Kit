@@ -190,7 +190,10 @@ export class WalletClient {
     const builder = new TxBuilder()
       .addMessages(...compiled.messages)
       .setMemo(opts.memo ?? "")
-      .setFee(fee.required_fee, BigInt(fee.gas_limit));
+      // The gateway's `required_fee` is a lower-bound estimate the ante may
+      // exceed under the full fee formula, and it's denom-suffixed. Add a
+      // margin (capped at max_fee) and pass the bare base-unit amount.
+      .setFee(feeWithMargin(fee), BigInt(fee.gas_limit));
     if (compiled.feePayer) builder.setFeePayer(compiled.feePayer);
 
     const signed = builder.signWith(wallet, {
@@ -216,6 +219,26 @@ function resolveAccount(source: WalletClientConfig["account"]): AetraAccount {
   if ("type" in source && (source.type === "local" || source.type === "connect")) return source;
   if ("mnemonic" in source || "privateKeyHex" in source) return localAccount(source);
   throw new Error("WalletClient: unrecognized account source");
+}
+
+/** Bare base-unit amount from a possibly denom-suffixed coin ("400000000naet" → 400000000n). */
+function coinToNaet(coin: string): bigint {
+  const m = coin.match(/^\d+/);
+  return m ? BigInt(m[0]) : 0n;
+}
+
+/**
+ * A fee that satisfies the ante: the gateway's `required_fee` plus a margin
+ * (default 50%), capped at `max_fee` — mirrors the Dalen wallet's `feeWithMargin`.
+ * The gateway estimate can sit just under the ante's full-formula minimum, so a
+ * bare `required_fee` is often rejected.
+ */
+function feeWithMargin(fee: { required_fee: string; max_fee: string }, marginPercent = 50): string {
+  const required = coinToNaet(fee.required_fee);
+  const withMargin = required + (required * BigInt(marginPercent)) / 100n;
+  const max = coinToNaet(fee.max_fee);
+  const chosen = max > 0n && withMargin > max ? max : withMargin;
+  return chosen.toString();
 }
 
 function toNaetString(amount: AetAmount): string {

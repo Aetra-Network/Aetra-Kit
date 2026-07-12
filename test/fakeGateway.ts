@@ -46,9 +46,10 @@ export function fakeGateway(overrides: Partial<FakeGatewayState> = {}) {
       const gas = Number(url.searchParams.get("gas") ?? "200000");
       return json({
         gas_limit: gas,
-        required_fee: "500000000",
-        base_fee: "500000000",
-        max_fee: "1000000000",
+        // The real gateway returns the fee denom-suffixed — keep the fake honest.
+        required_fee: "500000000naet",
+        base_fee: "500000000naet",
+        max_fee: "1000000000naet",
         utilization_bps: 0,
         congested: false,
         at_hard_cap: false,
