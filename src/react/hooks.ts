@@ -4,9 +4,9 @@ import {
   useAetraConnect,
   useAetraConnectModal,
   useIsConnectionRestored,
-} from "@aetra/connect-react";
-import type { ConnectedAccount, ConnectTxMessage, SignMessageResult } from "@aetra/connect";
-import type { FieldValue } from "@aetra/sdk";
+} from "@aetra-network/connect-react";
+import type { ConnectedAccount, ConnectTxMessage, SignMessageResult } from "@aetra-network/connect";
+import type { FieldValue } from "@aetra-network/sdk";
 import type { PublicClient } from "../publicClient.js";
 import type { WalletClient, TxResult, DeployResult } from "../walletClient.js";
 import { useAetraKit } from "./provider.js";

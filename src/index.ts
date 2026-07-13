@@ -1,11 +1,11 @@
 /**
- * @aetra/kit — the viem/wagmi analogue for the Aetra L1.
+ * @aetra-network/kit — the viem/wagmi analogue for the Aetra L1.
  *
  * Layer map (Ethereum → Aetra):
- *   - viem's primitives  → `@aetra/sdk` (Address, Amount, TxBuilder, codecs)
+ *   - viem's primitives  → `@aetra-network/sdk` (Address, Amount, TxBuilder, codecs)
  *   - viem's clients     → this package: `createPublicClient` / `createWalletClient`
  *   - wagmi's connectors → accounts: `localAccount` (server/bot) + `connectAccount` (Aetra Connect)
- *   - wagmi's hooks      → `@aetra/kit/react`
+ *   - wagmi's hooks      → `@aetra-network/kit/react`
  *
  * One transaction-intent vocabulary executes through either account kind, so
  * the same app code runs on a server with a key and in a browser with a
@@ -40,6 +40,6 @@ export {
 } from "./utils.js";
 
 // Re-exports app code commonly needs alongside the clients
-export { Field, Amount, Address, Wallet, Mnemonic } from "@aetra/sdk";
-export type { FieldValue, TxDetail, FeeEstimate } from "@aetra/sdk";
-export type { ConnectTxMessage, SignMessageResult } from "@aetra/connect";
+export { Field, Amount, Address, Wallet, Mnemonic } from "@aetra-network/sdk";
+export type { FieldValue, TxDetail, FeeEstimate } from "@aetra-network/sdk";
+export type { ConnectTxMessage, SignMessageResult } from "@aetra-network/connect";

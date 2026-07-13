@@ -1,5 +1,5 @@
 /**
- * @aetra/kit/react — wagmi-style hooks for Aetra.
+ * @aetra-network/kit/react — wagmi-style hooks for Aetra.
  *
  * ```tsx
  * const config = createConfig({
@@ -12,7 +12,7 @@
  * </AetraKitProvider>
  * ```
  *
- * The connect button/modal come from `@aetra/connect-react` (re-exported here) —
+ * The connect button/modal come from `@aetra-network/connect-react` (re-exported here) —
  * or wire `useConnect().connect` to any custom button.
  */
 export { createConfig } from "./config.js";
@@ -35,4 +35,4 @@ export {
 export type { UseAccountResult, UseBalanceResult, UseReadContractResult } from "./hooks.js";
 
 // UI building blocks, re-exported so a kit app needs one import root.
-export { AetraConnectButton, ConnectModal, Qr } from "@aetra/connect-react";
+export { AetraConnectButton, ConnectModal, Qr } from "@aetra-network/connect-react";

@@ -1,4 +1,4 @@
-import { GatewayClient, Address, Amount, Field, type FieldValue, type TxDetail, type FeeEstimate, type Status } from "@aetra/sdk";
+import { GatewayClient, Address, Amount, Field, type FieldValue, type TxDetail, type FeeEstimate, type Status } from "@aetra-network/sdk";
 
 /**
  * `PublicClient` — read-only chain access (the viem `publicClient` analogue).

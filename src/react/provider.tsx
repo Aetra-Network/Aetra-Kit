@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { AetraConnectProvider, useAetraConnect } from "@aetra/connect-react";
+import { AetraConnectProvider, useAetraConnect } from "@aetra-network/connect-react";
 import { WalletClient } from "../walletClient.js";
 import { connectAccount } from "../accounts.js";
 import type { PublicClient } from "../publicClient.js";

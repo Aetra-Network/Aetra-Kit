@@ -17,14 +17,14 @@ import {
   MsgExecuteExternal,
   type Message,
   type FieldValue,
-} from "@aetra/sdk";
-import type { ConnectTxMessage, ContractFieldSpec } from "@aetra/connect";
+} from "@aetra-network/sdk";
+import type { ConnectTxMessage, ContractFieldSpec } from "@aetra-network/connect";
 
 /**
  * The intent compiler — turns the protocol's `ConnectTxMessage` list (the SAME
  * shape a dApp sends over Aetra Connect) into signed-tx building blocks for the
  * local pipeline. One intent vocabulary, two executors: a connected wallet does
- * this mapping inside the wallet app; `@aetra/kit`'s local transport does it
+ * this mapping inside the wallet app; `@aetra-network/kit`'s local transport does it
  * here. Keep the two in sync when a kind is added.
  */
 

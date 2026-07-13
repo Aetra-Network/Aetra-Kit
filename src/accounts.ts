@@ -1,5 +1,5 @@
-import { Wallet, Mnemonic } from "@aetra/sdk";
-import type { AetraConnect } from "@aetra/connect/dapp";
+import { Wallet, Mnemonic } from "@aetra-network/sdk";
+import type { AetraConnect } from "@aetra-network/connect/dapp";
 
 /**
  * Accounts — the wagmi "connector/account" seam. A `WalletClient` executes the

@@ -1,6 +1,6 @@
-import { Address, Amount, Bytes, Wallet, TxBuilder, ContractCode, ContractAddress, type FieldValue, type TxDetail } from "@aetra/sdk";
-import { signMessage as signOffchain, type ConnectTxMessage, type SignMessageResult } from "@aetra/connect";
-import { AetraConnect } from "@aetra/connect/dapp";
+import { Address, Amount, Bytes, Wallet, TxBuilder, ContractCode, ContractAddress, type FieldValue, type TxDetail } from "@aetra-network/sdk";
+import { signMessage as signOffchain, type ConnectTxMessage, type SignMessageResult } from "@aetra-network/connect";
+import { AetraConnect } from "@aetra-network/connect/dapp";
 import { PublicClient, createPublicClient, type PublicClientConfig } from "./publicClient.js";
 import { localAccount, connectAccount, type AetraAccount, type LocalAccountSource } from "./accounts.js";
 import { compileIntents, payloadFrom, fieldsToSpecs } from "./intents.js";

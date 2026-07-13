@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 /**
  * Two bundles: the core client layer (`.`) and the React hooks (`./react`).
  * Splitting them keeps React fully out of server/bot bundles — a Node consumer
- * of `@aetra/kit` never touches react or @aetra/connect-react.
+ * of `@aetra-network/kit` never touches react or @aetra-network/connect-react.
  */
 export default defineConfig({
   entry: {
@@ -19,8 +19,8 @@ export default defineConfig({
     "react",
     "react-dom",
     "react/jsx-runtime",
-    "@aetra/sdk",
-    "@aetra/connect",
-    "@aetra/connect-react",
+    "@aetra-network/sdk",
+    "@aetra-network/connect",
+    "@aetra-network/connect-react",
   ],
 });

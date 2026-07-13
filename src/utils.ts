@@ -1,4 +1,4 @@
-import { Address, Amount, AET_DECIMALS } from "@aetra/sdk";
+import { Address, Amount, AET_DECIMALS } from "@aetra-network/sdk";
 
 /**
  * Functional utils — the viem-style counterparts to the SDK's `Address` and

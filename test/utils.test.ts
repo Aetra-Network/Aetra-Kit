@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Wallet } from "@aetra/sdk";
+import { Wallet } from "@aetra-network/sdk";
 import {
   parseAet,
   formatAet,

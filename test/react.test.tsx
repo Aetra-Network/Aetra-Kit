@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup, waitFor, fireEvent } from "@testing-library/react";
-import { Wallet } from "@aetra/sdk";
-import { AetraWalletConnect, MemoryBridge } from "@aetra/connect";
-import type { AetraConnect } from "@aetra/connect/dapp";
-import { useAetraConnect } from "@aetra/connect-react";
+import { Wallet } from "@aetra-network/sdk";
+import { AetraWalletConnect, MemoryBridge } from "@aetra-network/connect";
+import type { AetraConnect } from "@aetra-network/connect/dapp";
+import { useAetraConnect } from "@aetra-network/connect-react";
 import { createConfig, AetraKitProvider, useAccount, useBalance, useSendTransaction } from "../src/react/index.js";
 import { fakeGateway } from "./fakeGateway.js";
 
@@ -29,7 +29,7 @@ function Probe({ onConnect }: { onConnect: (c: AetraConnect) => void }) {
   );
 }
 
-describe("@aetra/kit/react", () => {
+describe("@aetra-network/kit/react", () => {
   it("connects, reads the balance in AET, and sends through the wallet", async () => {
     const bridge = new MemoryBridge();
     const { fetchImpl, state } = fakeGateway();

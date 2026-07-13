@@ -1,7 +1,7 @@
 {
-  "name": "@aetra/kit",
+  "name": "@aetra-network/kit",
   "version": "0.1.0",
-  "description": "The viem/wagmi analogue for the Aetra L1 — typed public/wallet clients, functional address & AET amount utils, a unified transaction-intent list that executes through a local key or a connected wallet, contract reads/execution/deployment, and React hooks (@aetra/kit/react).",
+  "description": "The viem/wagmi analogue for the Aetra L1 — typed public/wallet clients, functional address & AET amount utils, a unified transaction-intent list that executes through a local key or a connected wallet, contract reads/execution/deployment, and React hooks (@aetra-network/kit/react).",
   "keywords": [
     "aetra",
     "web3",
@@ -46,13 +46,13 @@
     "check": "npm run typecheck && npm run test && npm run build"
   },
   "peerDependencies": {
-    "@aetra/connect": ">=0.1.0 <1",
-    "@aetra/connect-react": ">=0.1.0 <1",
-    "@aetra/sdk": ">=0.1.0 <1",
+    "@aetra-network/connect": ">=0.1.0 <1",
+    "@aetra-network/connect-react": ">=0.1.0 <1",
+    "@aetra-network/sdk": ">=0.1.0 <1",
     "react": ">=18"
   },
   "peerDependenciesMeta": {
-    "@aetra/connect-react": {
+    "@aetra-network/connect-react": {
       "optional": true
     },
     "react": {
@@ -60,9 +60,9 @@
     }
   },
   "devDependencies": {
-    "@aetra/connect": "file:../aetra-connect",
-    "@aetra/connect-react": "file:../aetra-connect-react",
-    "@aetra/sdk": "file:../sdk",
+    "@aetra-network/connect": "file:../aetra-connect",
+    "@aetra-network/connect-react": "file:../aetra-connect-react",
+    "@aetra-network/sdk": "file:../sdk",
     "@testing-library/react": "^16.1.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -77,6 +77,7 @@
     "node": ">=18"
   },
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   }
 }

@@ -1,0 +1,51 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # GITHUB_TOKEN is minted automatically per-run by GitHub Actions — no
+    # manual secret/token setup required. It authenticates both installing
+    # from and publishing to the @aetra-network scope on GitHub Packages.
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+          scope: "@aetra-network"
+          always-auth: true
+
+      # devDependencies.@aetra-network/{connect,connect-react,sdk} are
+      # `file:../...` links used for local dev against the sibling checkouts
+      # in ecosystem/. This repo is checked out standalone in CI (no sibling
+      # directories), so `npm ci` would leave dangling symlinks and every
+      # later step would fail to resolve the imports. Point all three at the
+      # same registry ranges already declared in peerDependencies so npm
+      # installs the published packages from GitHub Packages instead. This
+      # is the bootstrapping case: it requires @aetra-network/sdk,
+      # @aetra-network/connect, and @aetra-network/connect-react to have
+      # ALL been published at least once already — for the very first
+      # publish of this whole package family, publish sdk and connect
+      # first (they have no @aetra-network/* deps of their own), then
+      # connect-react, and kit last.
+      - run: npm pkg set "devDependencies.@aetra-network/connect=>=0.1.0 <1"
+      - run: npm pkg set "devDependencies.@aetra-network/connect-react=>=0.1.0 <1"
+      - run: npm pkg set "devDependencies.@aetra-network/sdk=>=0.1.0 <1"
+      - run: npm install
+
+      - run: npm run check
+
+      - run: npm publish

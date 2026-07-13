@@ -1,4 +1,4 @@
-import type { AetraConnectProviderProps } from "@aetra/connect-react";
+import type { AetraConnectProviderProps } from "@aetra-network/connect-react";
 import { PublicClient, createPublicClient } from "../publicClient.js";
 
 /**

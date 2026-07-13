@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { Wallet, Field, Mnemonic } from "@aetra/sdk";
-import { AetraWalletConnect, MemoryBridge, type SendTransactionParams } from "@aetra/connect";
-import { AetraConnect } from "@aetra/connect/dapp";
+import { Wallet, Field, Mnemonic } from "@aetra-network/sdk";
+import { AetraWalletConnect, MemoryBridge, type SendTransactionParams } from "@aetra-network/connect";
+import { AetraConnect } from "@aetra-network/connect/dapp";
 import { createPublicClient, createWalletClient, localAccount, connectAccount } from "../src/index.js";
 import { fakeGateway } from "./fakeGateway.js";
 
