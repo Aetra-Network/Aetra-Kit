@@ -44,6 +44,12 @@ jobs:
       - run: npm pkg set "devDependencies.@aetra-network/connect=>=0.1.0 <1"
       - run: npm pkg set "devDependencies.@aetra-network/connect-react=>=0.1.0 <1"
       - run: npm pkg set "devDependencies.@aetra-network/sdk=>=0.1.0 <1"
+      # Drop the committed lockfile: it still pins the @aetra-network/* deps to
+      # `file:../...`, and `npm install` would honor those stale links (dangling
+      # symlinks in this standalone checkout) instead of the registry ranges set
+      # above — leaving the packages unresolvable. Deleting it forces a fresh
+      # resolve from GitHub Packages.
+      - run: rm -f package-lock.json
       - run: npm install
 
       - run: npm run check

@@ -36,15 +36,37 @@ const GAS: Record<string, bigint> = {
   "stake.unbond": 300_000n,
   "stake.claim": 250_000n,
   "contract.execute": 0n, // computed: avm gasLimit + 100k
-  "contract.deploy": 400_000n,
+  "contract.deploy": 0n, // computed: deployGasFor(bytecode length)
   raw: 200_000n,
 };
+
+/**
+ * A `contract.deploy` carries a `MsgStoreCode` whose cost is dominated by
+ * persisting the bytecode into the KV store — the SDK's default gas config
+ * charges that at ~`WriteCostPerByte` (30) gas/byte on top of the deploy/tx
+ * overhead. A flat default silently under-funds large contracts, so scale the
+ * suggested gas with bytecode length. Callers can override per-intent via
+ * `intent.gasLimit` (which, for `contract.deploy`, is the OUTER fee gas — not
+ * AVM gas as it is for `contract.execute`). Validate the constant against the
+ * live gas schedule once a testnet is up.
+ */
+const DEPLOY_BASE_GAS = 400_000n;
+const DEPLOY_GAS_PER_BYTE = 30n;
+function deployGasFor(bytecodeLen: number): bigint {
+  return DEPLOY_BASE_GAS + DEPLOY_GAS_PER_BYTE * BigInt(bytecodeLen);
+}
 
 export interface CompiledIntents {
   messages: Message[];
   /** Suggested outer fee gas (sum of per-intent defaults). */
   gasLimit: bigint;
-  /** Set when a message's own signer can't pay (activation) — the plain account pays. */
+  /**
+   * Reserved: an explicit fee payer distinct from the tx signer. `compileIntents`
+   * never sets this today — `activate` deliberately relies on the sole AuthInfo
+   * signer paying (an AE-form payer fails the ante's bech32 decode; see the
+   * `activate` case). Kept on the type so `WalletClient` can honor it if a future
+   * intent kind needs a separate payer, without a breaking change.
+   */
   feePayer?: Address;
   /** Client-side-predicted contract addresses, in `contract.deploy` intent order. */
   predictedContracts: { address: Address; codeId: string }[];
@@ -55,7 +77,6 @@ export function compileIntents(intents: ConnectTxMessage[], signer: Wallet, heig
   const messages: Message[] = [];
   const predictedContracts: { address: Address; codeId: string }[] = [];
   let gasLimit = 0n;
-  let feePayer: Address | undefined;
 
   for (const intent of intents) {
     switch (intent.kind) {
@@ -138,7 +159,7 @@ export function compileIntents(intents: ConnectTxMessage[], signer: Wallet, heig
           }),
         );
         predictedContracts.push({ address, codeId });
-        gasLimit += BigInt(intent.gasLimit ?? Number(GAS["contract.deploy"]!));
+        gasLimit += intent.gasLimit !== undefined ? BigInt(intent.gasLimit) : deployGasFor(bytecode.length);
         break;
       }
       case "raw": {
@@ -154,9 +175,7 @@ export function compileIntents(intents: ConnectTxMessage[], signer: Wallet, heig
     }
   }
 
-  const result: CompiledIntents = { messages, gasLimit, predictedContracts };
-  if (feePayer) result.feePayer = feePayer;
-  return result;
+  return { messages, gasLimit, predictedContracts };
 }
 
 /** `[{name,type,value}]` specs → a `ContractPayload` (empty when absent). */

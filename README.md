@@ -15,7 +15,24 @@ utils, one transaction-intent vocabulary that executes through a local key
 
 ## Install
 
+The `@aetra-network` scope is published to **private GitHub Packages**
+(`https://npm.pkg.github.com`), not the public npm registry — a bare
+`npm install @aetra-network/kit` against npmjs.com will 404. To install it,
+point the scope at GitHub Packages and authenticate with a GitHub token that
+has the `read:packages` scope (and access to the Aetra-Network org, since the
+packages are restricted).
+
+Add an `.npmrc` in your project (see [`.npmrc.example`](./.npmrc.example)):
+
+```ini
+@aetra-network:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+Then export your token and install:
+
 ```bash
+export NODE_AUTH_TOKEN=ghp_your_token_with_read_packages
 npm install @aetra-network/kit @aetra-network/sdk @aetra-network/connect
 # for the React hooks additionally:
 npm install @aetra-network/connect-react react
